@@ -1,5 +1,6 @@
 #! python3
 # covidData.py - downloads latest covid data from stthomas dashboard
+# TODO: rewrite using pandas for the table to make the graphing better
 
 import requests, bs4, os, math
 import matplotlib.pyplot as plt
@@ -37,24 +38,36 @@ def plot_data(table):
     plt.grid(True)
     plt.show()
 
-# Get webpage, make soup
-url = 'https://www.stthomas.edu/covid19/dashboard/historical/index.html'
-res = requests.get(url)
-res.raise_for_status()
-soup = bs4.BeautifulSoup(res.text, features='html.parser')
 
-table = [[]]
-current_row = 0
-string_count = 0
-for i in soup.find('table').stripped_strings:
-    table[current_row].append(i.replace('*', ''))
-    string_count += 1
-    if string_count == 6:
-        table.append([])
-        current_row += 1
-        string_count = 0
-table.pop()
+def get_data(url='https://www.stthomas.edu/covid19/dashboard/historical/index.html'):
+    """Return a matrix of the data at the URL."""
 
-print_table(table)
-if input("Enter q to quit, enter any other key to continue to graph: ").lower() != 'q':
-    plot_data(table)
+    # Get webpage, make soup
+    res = requests.get(url)
+    res.raise_for_status()
+    soup = bs4.BeautifulSoup(res.text, features='html.parser')
+
+    table = [[]]
+    current_row = 0
+    string_count = 0
+    for i in soup.find('table').stripped_strings:
+        table[current_row].append(i.replace('*', ''))
+        string_count += 1
+        if string_count == 6:
+            table.append([])
+            current_row += 1
+            string_count = 0
+    table.pop()
+    return table
+
+if __name__ == '__main__':
+    # TODO: set up a function to put all data together into one graph (easier with pandas)
+    # TODO: set up a function to graph both sets of data as subplots of the same matplotlib figure
+    urls = [
+        'https://www.stthomas.edu/covid19/dashboard/historical/index.html',
+        'https://www.stthomas.edu/covid19/dashboard/',
+    ]
+    for url in urls:
+        table = get_data(url)
+        print_table(table)
+        plot_data(table)
