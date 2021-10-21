@@ -1,24 +1,10 @@
 #! python3
 # covidData.py - downloads latest covid data from stthomas dashboard
-# TODO: rewrite using pandas for the table to make the graphing better
 
 import requests, bs4, os, math
 import matplotlib.pyplot as plt
+import pandas as pd
 
-def print_table(table):
-    width_of_terminal = os.get_terminal_size()[0]
-    number_of_columns = len(table[0])
-    column_width = math.floor(width_of_terminal/number_of_columns) - 1
-    print()
-    print('=' * width_of_terminal)
-    for row in table:
-        for item in row:
-            if len(item) > column_width:
-                item = item[:column_width - 3] + '...'
-            print(item.ljust(column_width), end='|')
-        print()
-    print('=' * width_of_terminal)
-    print()
 
 def plot_data(table):
     dates = [row[0] for row in table[1:]]
@@ -40,25 +26,34 @@ def plot_data(table):
 
 
 def get_data(url='https://www.stthomas.edu/covid19/dashboard/historical/index.html'):
-    """Return a matrix of the data at the URL."""
+    """Return a DataFrame of the data at the URL."""
 
     # Get webpage, make soup
     res = requests.get(url)
     res.raise_for_status()
     soup = bs4.BeautifulSoup(res.text, features='html.parser')
 
-    table = [[]]
-    current_row = 0
-    string_count = 0
-    for i in soup.find('table').stripped_strings:
-        table[current_row].append(i.replace('*', ''))
-        string_count += 1
-        if string_count == 6:
-            table.append([])
-            current_row += 1
-            string_count = 0
-    table.pop()
-    return table
+    table_elem = soup.find('table')
+    tbody_elem = table_elem.find('tbody')
+    row_elems = tbody_elem.find_all('tr')
+    # Get table headers
+    headers = [x.text.strip() for x in table_elem.find('thead').find_all('th')]
+    # Get table data
+    data = []
+    for row in row_elems[1:]:
+        d = [x.text for x in row.find_all(['th', 'td'])]
+        # Get 'week of' column and keep as a string
+        d[0] = d[0].strip()
+        # All other data should be integers
+        for i in range(1, len(d)):
+            item = d[i]
+            if not item.isdigit():
+                d[i] = 'nan'
+            else:
+                d[i] = int(item)
+        data.append(d)
+    return pd.DataFrame(data=data, columns=headers)
+    
 
 if __name__ == '__main__':
     # TODO: set up a function to put all data together into one graph (easier with pandas)
