@@ -6,9 +6,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 
-def plot_data(table):
-    dates = [row[0] for row in table[1:]]
-    total_cases = [int(row[1]) for row in table[1:]]
+def plot_total_cases(df):
+    dates = df['Week Of']
+    total_cases = df['Total Positive']
 
     fig, ax = plt.subplots()
     ax.set_position([0.1, 0.2, 0.8, 0.7])
@@ -36,11 +36,11 @@ def get_data(url='https://www.stthomas.edu/covid19/dashboard/historical/index.ht
     table_elem = soup.find('table')
     tbody_elem = table_elem.find('tbody')
     row_elems = tbody_elem.find_all('tr')
-    # Get table headers
-    headers = [x.text.strip() for x in table_elem.find('thead').find_all('th')]
+    # Get table headers. Strip whitespace, capitalize each first letter
+    headers = [x.text.strip().title() for x in table_elem.find('thead').find_all('th')]
     # Get table data
     data = []
-    for row in row_elems[1:]:
+    for row in row_elems:
         d = [x.text for x in row.find_all(['th', 'td'])]
         # Get 'week of' column and keep as a string
         d[0] = d[0].strip()
@@ -48,7 +48,11 @@ def get_data(url='https://www.stthomas.edu/covid19/dashboard/historical/index.ht
         for i in range(1, len(d)):
             item = d[i]
             if not item.isdigit():
-                d[i] = 'nan'
+                no_asterisk = item.replace('*', '')
+                if no_asterisk.isdigit():
+                    d[i] = int(no_asterisk)
+                else:
+                    d[i] = 'nan'
             else:
                 d[i] = int(item)
         data.append(d)
@@ -63,6 +67,8 @@ if __name__ == '__main__':
         'https://www.stthomas.edu/covid19/dashboard/',
     ]
     for url in urls:
-        table = get_data(url)
-        print_table(table)
-        plot_data(table)
+        df = get_data(url)
+        print(url)
+        print(df)
+        print()
+        plot_total_cases(df)
