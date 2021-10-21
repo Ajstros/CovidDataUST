@@ -1,8 +1,8 @@
 import covid_data
 
 urls = [
-    'https://www.stthomas.edu/covid19/dashboard/historical/index.html',
-    'https://www.stthomas.edu/covid19/dashboard/',
+    "https://www.stthomas.edu/covid19/dashboard/historical/index.html",
+    "https://www.stthomas.edu/covid19/dashboard/",
 ]
 dfs = []
 for url in urls:
