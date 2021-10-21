@@ -1,27 +1,72 @@
 #! python3
 # covidData.py - downloads latest covid data from stthomas dashboard
 
-import requests, bs4, os, math
+import requests, bs4
 import matplotlib.pyplot as plt
 import pandas as pd
 
 
-def plot_total_cases(df):
-    dates = df['Week Of']
-    total_cases = df['Total Positive']
+def plot_total_cases(*argv):
+    """Plot the total new cases vs. weeks on the same plot.
+    
+    Arguments
+    ---------
+    *argv : pandas.DataFrame
+        Any number of DataFrames with "Total Positive" and "Week Of" columns to graph.
+    """
 
     fig, ax = plt.subplots()
     ax.set_position([0.1, 0.2, 0.8, 0.7])
 
-    plt.plot(dates, total_cases)
-    # plt.ylim(0, max(total_cases))
-    plt.title("Total New Covid Cases at St. Thomas")
-    plt.xlabel("Date")
-    plt.ylabel("Total New Cases")
-    for label in ax.get_xticklabels(): # Rotates x labels
-        label.set_rotation(40)
-        label.set_horizontalalignment('right')
-    plt.grid(True)
+    for df in argv:
+        dates = df['Week Of']
+        total_cases = df['Total Positive']
+
+
+        plt.plot(dates, total_cases)
+        # plt.ylim(0, max(total_cases))
+        plt.title("Total New Covid Cases at St. Thomas")
+        plt.xlabel("Date")
+        plt.ylabel("Total New Cases")
+        for label in ax.get_xticklabels(): # Rotates x labels
+            label.set_rotation(40)
+            label.set_horizontalalignment('right')
+        plt.grid(True)
+    plt.show()
+
+def plot_total_cases_subplots(*argv):
+    """Plot the total new cases vs. weeks on the separate subplots.
+    
+    Arguments
+    ---------
+    *argv : pandas.DataFrame
+        Any number of DataFrames with "Total Positive" and "Week Of" columns to graph.
+    """
+
+    fig, axes = plt.subplots(nrows=1, ncols=len(argv))
+    print(axes)
+
+    for i in range(len(argv)):
+        df = argv[i]
+        dates = df['Week Of']
+        total_cases = df['Total Positive']
+        ax = axes[i]
+
+        left = 0.1
+        width = 0.8
+        height = 0.3
+        bottom = 0.175 + (height + 0.175)*i
+        ax.set_position([left, bottom, width, height])
+        plt.sca(ax)
+        plt.plot(dates, total_cases)
+        plt.ylim(0)
+        plt.title("Total New Covid Cases at St. Thomas")
+        plt.xlabel("Date")
+        plt.ylabel("Total New Cases")
+        for label in ax.get_xticklabels():  # Rotates x labels
+            label.set_rotation(40)
+            label.set_horizontalalignment('right')
+        plt.grid(True)
     plt.show()
 
 
@@ -62,13 +107,16 @@ def get_data(url='https://www.stthomas.edu/covid19/dashboard/historical/index.ht
 if __name__ == '__main__':
     # TODO: set up a function to put all data together into one graph (easier with pandas)
     # TODO: set up a function to graph both sets of data as subplots of the same matplotlib figure
+    # TODO: add command line flags
     urls = [
         'https://www.stthomas.edu/covid19/dashboard/historical/index.html',
         'https://www.stthomas.edu/covid19/dashboard/',
     ]
+    dfs = []
     for url in urls:
         df = get_data(url)
+        dfs.append(df)
         print(url)
         print(df)
         print()
-        plot_total_cases(df)
+    plot_total_cases_subplots(dfs[0], dfs[1])
