@@ -1,4 +1,4 @@
-import covidData
+import covid_data
 
 urls = [
     'https://www.stthomas.edu/covid19/dashboard/historical/index.html',
