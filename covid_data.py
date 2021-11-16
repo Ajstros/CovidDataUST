@@ -104,11 +104,13 @@ def get_data(url="https://www.stthomas.edu/covid19/dashboard/historical/index.ht
             else:
                 d[i] = int(item)
         data.append(d)
-    return pd.DataFrame(data=data, columns=headers)
+    # Table on the webpage has newest on top, so we must reverse the data
+    return pd.DataFrame(data=data[::-1], columns=headers)
 
 
 if __name__ == "__main__":
     # TODO: add command line flags
+    # TODO: add ability to show last year and this year as different colored lines on the same graph
     urls = [
         "https://www.stthomas.edu/covid19/dashboard/historical/index.html",
         "https://www.stthomas.edu/covid19/dashboard/",
@@ -120,4 +122,5 @@ if __name__ == "__main__":
         print(url)
         print(df)
         print()
-    plot_total_cases_subplots(dfs[0], dfs[1])
+    # plot_total_cases_subplots(dfs[0], dfs[1])
+    plot_total_cases(dfs[0])
