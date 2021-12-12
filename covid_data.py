@@ -89,9 +89,8 @@ def get_data(url="https://www.stthomas.edu/covid19/dashboard/historical/index.ht
     # Get table data
     data = []
     for row in row_elems:
-        d = [x.text for x in row.find_all(["th", "td"])]
-        # Get 'week of' column and keep as a string
-        d[0] = d[0].strip()
+        d = [x.text.strip() for x in row.find_all(["th", "td"])]
+        # Leave 'week of' column as a string
         # All other data should be integers
         for i in range(1, len(d)):
             item = d[i]
