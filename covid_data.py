@@ -1,6 +1,6 @@
 """Scrape and plot the COVID new case data at the University of St. Thomas.
 
-October 2021
+January 2022
 Abe Stroschein, ajstroschein@stthomas.edu
 """
 
@@ -16,6 +16,10 @@ def plot_total_cases(*argv):
     ---------
     *argv : pandas.DataFrame
         Any number of DataFrames with "Total Positive" and "Week Of" columns to graph.
+
+    Returns
+    -------
+    None
     """
 
     fig, ax = plt.subplots()
@@ -44,6 +48,10 @@ def plot_total_cases_subplots(*argv):
     ---------
     *argv : pandas.DataFrame
         Any number of DataFrames with "Total Positive" and "Week Of" columns to graph.
+
+    Returns
+    -------
+    None
     """
 
     fig, axes = plt.subplots(nrows=1, ncols=len(argv))
@@ -74,7 +82,17 @@ def plot_total_cases_subplots(*argv):
 
 
 def get_data(url="https://www.stthomas.edu/covid19/dashboard/historical/index.html"):
-    """Return a DataFrame of the data at the URL."""
+    """Return a DataFrame of the data at the URL.
+    
+    Arguments
+    ---------
+    url : str
+        The URL to retrieve data from. Defaults to UST historical dashboard.
+    
+    Returns
+    -------
+    pandas.DataFrame : the data scraped from the URL.
+    """
 
     # Get webpage, make soup
     res = requests.get(url)
@@ -121,5 +139,4 @@ if __name__ == "__main__":
         print(url)
         print(df)
         print()
-    # plot_total_cases_subplots(dfs[0], dfs[1])
     plot_total_cases(dfs[0])
