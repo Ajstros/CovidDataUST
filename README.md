@@ -46,4 +46,4 @@ https://www.stthomas.edu/covid19/dashboard/
 1  September 10 - September 16, 2022              64                  8                56                  16               48
 ```
 
-[Plot of COVID data from April 2020 to September 16, 2022](https://github.com/Ajstros/CovidDataUST/blob/main/example_plot.png)
+![Plot of COVID data from April 2020 to September 16, 2022](https://github.com/Ajstros/CovidDataUST/blob/main/example_plot.png)
